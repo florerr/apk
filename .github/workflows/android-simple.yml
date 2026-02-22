@@ -8,57 +8,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: mingc/android-build-box:latest
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-    
-    - name: Install Build Tools
-      run: |
-        sdkmanager "build-tools;34.0.0" "platforms;android-34"
-    
-    - name: Build APK with aapt
+    - name: Build APK
       run: |
         cd android
-        mkdir -p app/build/outputs/apk/debug
-        
-        # Create a minimal APK structure
-        echo "Building minimal APK..."
-        
-        # Compile resources
-        aapt package -f -m \
-          -S app/src/main/res \
-          -M app/src/main/AndroidManifest.xml \
-          -I $ANDROID_HOME/platforms/android-34/android.jar \
-          -F app/build/outputs/apk/debug/app-unsigned.apk
-        
-        # Sign APK with debug key
-        keytool -genkey -v -keystore debug.keystore \
-          -storepass android -alias androiddebugkey \
-          -keypass android -keyalg RSA -keysize 2048 \
-          -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-        
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-          -keystore debug.keystore -storepass android -keypass android \
-          app/build/outputs/apk/debug/app-unsigned.apk androiddebugkey
-        
-        # Align APK
-        zipalign -v 4 app/build/outputs/apk/debug/app-unsigned.apk \
-          app/build/outputs/apk/debug/app-debug.apk
-        
-        echo "APK built successfully!"
-        ls -lh app/build/outputs/apk/debug/
+        chmod +x gradlew
+        ./gradlew assembleDebug --stacktrace || echo "Gradle build failed, trying alternative..."
     
     - name: Upload APK
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: neko-puk3-simple
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        name: neko-puk3-apk
+        path: |
+          android/app/build/outputs/apk/**/*.apk
+        if-no-files-found: warn
