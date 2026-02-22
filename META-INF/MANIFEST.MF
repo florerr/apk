@@ -1,0 +1,11 @@
+Manifest-Version: 1.0 
+Created-By: 1.0 (Android) 
+ 
+Name: AndroidManifest.xml 
+SHA-256-Digest: (будет заполнено при подписи) 
+ 
+Name: classes.dex 
+SHA-256-Digest: (будет заполнено при подписи) 
+ 
+Name: resources.arsc 
+SHA-256-Digest: (будет заполнено при подписи) 
