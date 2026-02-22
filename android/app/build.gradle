@@ -1,129 +1,29 @@
 apply plugin: "com.android.application"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
-
-import com.android.build.OutputFile
-import com.android.build.VariantOutput
-import org.apache.tools.ant.taskdefs.condition.Os
-
-/**
- * This is the configuration block to customize your React Native Android app.
- * By default you don't need to apply the configuration, but you can if you want
- * to tweak the React Native configuration.
- */
-project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
-]
-
-apply from: "../../node_modules/react-native/react.gradle"
-
-/**
- * The react.gradle file accesses a function from the React Native gradle plugin.
- */
-apply from: "../../node_modules/react-native/react.gradle"
-
-/**
- * This is the configuration block to customize your React Native Android app.
- * By default you don't need to apply any configuration, just uncomment the lines you need.
- */
-react {
-    /* Folders */
-    //   The root of your project, i.e. where "package.json" is located. Default is '../..'
-    // root = file("../../")
-    //   The folder where the react-native NPM package is. Default is ../../node_modules/react-native
-    // reactNativeDir = file("../../node_modules/react-native")
-    //   The folder where the react-native Codegen package is. Default is ../../codegen
-    // codegenDir = file("../../codegen")
-    //   The cli.js file which is the React Native CLI entrypoint
-    // cliFile = file("../../node_modules/react-native/cli.js")
-    /* Variants */
-    //   The list of variants to that are debuggable. For those we're going to
-    //   skip the bundling of the JS bundle and the assets.
-    //   The list is followed by the test build type (if present)
-    //   By default, just the debug and release build types are generated.
-    //   You can add more build types to the list.
-    debuggableVariants = ["debug"]
-}
-
-/**
- * Set this to true to create four separate APKs instead of one,
- * one for each native architecture. This is useful if you don't
- * use App Bundles (https://developer.android.com/guide/app-bundle/)
- * and want to have separate APKs for each architecture.
- */
-def enableSeparateBuildPerCPUArchitecture = false
-
-/**
- * The preferred build flavor of JavaScriptCore (JSC)
- *
- * For example, to use the international variant, add:
- * jscFlavor = 'org.webkit:android-jsc-intl:+'
- */
-def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
-    ndkVersion rootProject.ext.ndkVersion
-
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 34
     namespace "com.nekopuk3"
+    
     defaultConfig {
         applicationId "com.nekopuk3"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
 
-    splits {
-        abi {
-            reset()
-            enable enableSeparateBuildPerCPUArchitecture
-            universalApk false
-            include "armeabi-v7a", "arm64-v8a"
-        }
-    }
-    signingConfigs {
-        debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
-    }
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            minifyEnabled false
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.facebook.react:react-android"
-    implementation "androidx.core:core-splashscreen:1.0.0"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
-        exclude group:'com.facebook.fbjni'
-    }
-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
-    }
-    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
-    }
-    if (hermesEnabled.toBoolean()) {
-        implementation("com.facebook.react:hermes-engine")
-    } else {
-        implementation jscFlavor
-    }
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
 }
-
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle")
-applyNativeModulesAppBuildGradle(project)
