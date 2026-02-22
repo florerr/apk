@@ -24,26 +24,28 @@ jobs:
     - name: 🤖 Setup Android SDK
       uses: android-actions/setup-android@v3
     
-    - name: 🔧 Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 8.5
+    - name: 🔧 Make gradlew executable
+      run: chmod +x android/gradlew
     
     - name: 🔨 Build Debug APK
-      working-directory: ./android
       run: |
-        gradle assembleDebug --stacktrace
+        cd android
+        ./gradlew assembleDebug --no-daemon --stacktrace
     
     - name: 📦 Upload Debug APK
-      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: neko-puk3-debug
-        path: android/app/build/outputs/apk/debug/app-debug.apk
+        path: android/app/build/outputs/apk/debug/*.apk
         retention-days: 30
     
-    - name: 📊 APK Info
-      if: success()
+    - name: 📊 Build Summary
+      if: always()
       run: |
-        echo "✅ Build completed successfully!"
-        ls -lh android/app/build/outputs/apk/debug/app-debug.apk
+        if [ -f android/app/build/outputs/apk/debug/app-debug.apk ]; then
+          echo "✅ APK built successfully!"
+          ls -lh android/app/build/outputs/apk/debug/app-debug.apk
+        else
+          echo "❌ APK not found"
+          exit 1
+        fi
